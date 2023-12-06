@@ -1,21 +1,36 @@
-version: '3'
+version: "3"
 
 services:
-###> doctrine/doctrine-bundle ###
+  ###> doctrine/doctrine-bundle ###
   database:
-    image: postgres:${POSTGRES_VERSION:-15}-alpine
+    image: mysql:latest
+    container_name: mysql-la-grande-enfant
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: la-grande-enfant-db
+    ports:
+      - "6033:3306"
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - dbdata:/var/lib/mysql
+
+  phpmyadmin-la-grande-enfant:
+    image: phpmyadmin:5.2
+    container_name: phpmyadmin-la-grande-enfant
+    links:
+      - database
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - "8080:80"
+
+  ###> symfony/mailer ###
+  mailer:
+    image: schickling/mailcatcher
+    ports: ["1025", "1080"]
+  ###< symfony/mailer ###
 
 volumes:
-###> doctrine/doctrine-bundle ###
-  database_data:
-###< doctrine/doctrine-bundle ###
+  dbdata:
