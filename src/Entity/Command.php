@@ -44,7 +44,7 @@ class Command
 
     #[ORM\ManyToOne(inversedBy: 'command')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private ?User $customer = null;
 
     #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'commands')]
     private Collection $products;
@@ -167,14 +167,14 @@ class Command
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getCustomer(): ?User
     {
-        return $this->user;
+        return $this->customer;
     }
 
-    public function setUser(?User $user): static
+    public function setCustomer(?User $customer): static
     {
-        $this->user = $user;
+        $this->customer = $customer;
 
         return $this;
     }

@@ -43,13 +43,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $comments;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Command::class)]
-    private Collection $command;
+    private Collection $commands;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $shippingInfos = null;
 
     public function __construct()
     {
         $this->registrationDate = new \DateTime;
         $this->comments = new ArrayCollection();
-        $this->command = new ArrayCollection();
+        $this->commands = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -196,16 +199,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Command>
      */
-    public function getCommand(): Collection
+    public function getCommands(): Collection
     {
-        return $this->command;
+        return $this->commands;
     }
 
     public function addCommand(Command $command): static
     {
-        if (!$this->command->contains($command)) {
-            $this->command->add($command);
-            $command->setUser($this);
+        if (!$this->commands->contains($command)) {
+            $this->commands->add($command);
+            $command->setCustomer($this);
         }
 
         return $this;
@@ -213,12 +216,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeCommand(Command $command): static
     {
-        if ($this->command->removeElement($command)) {
+        if ($this->commands->removeElement($command)) {
             // set the owning side to null (unless already changed)
-            if ($command->getUser() === $this) {
-                $command->setUser(null);
+            if ($command->getCustomer() === $this) {
+                $command->setCustomer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getShippingInfos(): ?string
+    {
+        return $this->shippingInfos;
+    }
+
+    public function setShippingInfos(?string $shippingInfos): static
+    {
+        $this->shippingInfos = $shippingInfos;
 
         return $this;
     }
