@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -26,6 +29,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $firstname = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $lastname = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $registrationDate = null;
+
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class)]
+    private Collection $comments;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Command::class)]
+    private Collection $commands;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $shippingInfos = null;
+
+    public function __construct()
+    {
+        $this->registrationDate = new \DateTime;
+        $this->comments = new ArrayCollection();
+        $this->commands = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -95,5 +123,118 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): static
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(string $lastname): static
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    public function getRegistrationDate(): ?\DateTimeInterface
+    {
+        return $this->registrationDate;
+    }
+
+    public function setRegistrationDate(\DateTimeInterface $registrationDate): static
+    {
+        $this->registrationDate = $registrationDate;
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->firstname . ' ' . $this->lastname;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getAuthor() === $this) {
+                $comment->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Command>
+     */
+    public function getCommands(): Collection
+    {
+        return $this->commands;
+    }
+
+    public function addCommand(Command $command): static
+    {
+        if (!$this->commands->contains($command)) {
+            $this->commands->add($command);
+            $command->setCustomer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommand(Command $command): static
+    {
+        if ($this->commands->removeElement($command)) {
+            // set the owning side to null (unless already changed)
+            if ($command->getCustomer() === $this) {
+                $command->setCustomer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getShippingInfos(): ?string
+    {
+        return $this->shippingInfos;
+    }
+
+    public function setShippingInfos(?string $shippingInfos): static
+    {
+        $this->shippingInfos = $shippingInfos;
+
+        return $this;
     }
 }
