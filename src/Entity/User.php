@@ -44,7 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class)]
     private Collection $comments;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Command::class)]
+    #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Command::class)]
     private Collection $commands;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

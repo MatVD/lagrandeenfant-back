@@ -42,7 +42,7 @@ class Command
     #[ORM\Column]
     private ?float $totalPrice = null;
 
-    #[ORM\ManyToOne(inversedBy: 'command')]
+    #[ORM\ManyToOne(inversedBy: 'commands')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $customer = null;
 
