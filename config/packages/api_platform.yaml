@@ -8,7 +8,8 @@ api_platform:
     jsonopenapi: ["application/vnd.openapi+json"]
     html: ["text/html"]
   defaults:
-    stateless: false
+    pagination_items_per_page: 10 #30 Default value
+    stateless: true
     cache_headers:
       vary: ["Content-Type", "Authorization", "Origin"]
     extra_properties:
