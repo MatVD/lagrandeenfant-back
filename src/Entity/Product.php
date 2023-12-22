@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource]
@@ -19,15 +20,25 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le nom de l\'oeuvre.')]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner une description.')]
+    #[Assert\Length(
+        min: 2,
+        max: 500,
+        minMessage: 'Veuillez renseigner une description d\'au moins {{ limit }} caratères.',
+        maxMessage: 'Veuillez renseigner une description avec moins de {{ limit }} caratères'
+    )]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\NotBlank(message: 'Veuillez indiquer la quantité en stock.')]
     private ?int $quantity = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le prix de l\'oeuvre.')]
     private ?float $price = null;
 
     #[ORM\Column(length: 255)]

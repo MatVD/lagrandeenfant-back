@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommandRepository::class)]
 #[ApiResource]
@@ -18,15 +19,18 @@ class Command
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'La date de création ne peut être vide.')]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $shippingDate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank(message: 'Le statut de la commande ne peut être vide. Il est soit "En cours de traitement" soit "Commande envoyée" soit "Commande reçue"')]
     private ?string $commandStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank(message: 'Le statut du paiement ne peut être vide. Il est soit "Non payée" soit "Payée"')]
     private ?string $paymentStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -42,18 +46,22 @@ class Command
     private ?int $totalQuantity = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le prix total de la commande ne peut être vide.')]
     private ?float $totalPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'commands')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le client qui à fait l\'achat.')]
     private ?User $customer = null;
 
     #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'commands')]
+    #[Assert\NotBlank(message: 'Veuillez renseigner l\'oeuvre qui a été acheté.')]
     private Collection $products;
 
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

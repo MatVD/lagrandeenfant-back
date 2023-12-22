@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ApiResource]
@@ -19,9 +20,13 @@ class Category
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le nom de la catégorie ne peut être vide.')]
+    #[Assert\Length(min: 1, max: 255, minMessage: "Le nom doit avoir au moins {{ limit }} caracteres", maxMessage: "Le nom doit avoir maximum {{ limit }} caractères")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'Le contenu ne peut être vide.')]
+    #[Assert\Length(min: 1, max: 100, minMessage: "La description doit avoir au moins {{ limit }} caracteres", maxMessage: "La description doit avoir maximum {{ limit }} caractères")]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
