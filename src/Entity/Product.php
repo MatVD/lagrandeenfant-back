@@ -9,9 +9,26 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: "Vous n'avez pas les droits pour cette action."
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: "Vous n'avez pas les droits pour cette action."
+        )
+    ]
+)]
 class Product
 {
     #[ORM\Id]
