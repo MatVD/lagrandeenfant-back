@@ -26,11 +26,17 @@ class Command
     private ?\DateTimeImmutable $shippingDate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\NotBlank(message: 'Le statut de la commande ne peut être vide. Il est soit "En cours de traitement" soit "Commande envoyée" soit "Commande reçue"')]
+    #[Assert\Choice(
+        choices: ['En cours de traitement', 'Envoyée', 'Reçue'],
+        message: 'Le statut de la commande doit faire partie des trois états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
+    )]
     private ?string $commandStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\NotBlank(message: 'Le statut du paiement ne peut être vide. Il est soit "Non payée" soit "Payée"')]
+    #[Assert\Choice(
+        choices: ['Non payée', 'Payée'],
+        message: 'Le statut de la commande doit faire partie des deux états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
+    )]
     private ?string $paymentStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -62,6 +68,7 @@ class Command
     {
         $this->products = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->commandStatus = "Non payée";
     }
 
     public function getId(): ?int
