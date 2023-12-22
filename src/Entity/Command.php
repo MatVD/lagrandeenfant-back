@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommandRepository::class)]
 #[ApiResource]
@@ -18,15 +19,24 @@ class Command
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'La date de création ne peut être vide.')]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $shippingDate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Choice(
+        choices: ['En cours de traitement', 'Envoyée', 'Reçue'],
+        message: 'Le statut de la commande doit faire partie des trois états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
+    )]
     private ?string $commandStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Choice(
+        choices: ['Non payée', 'Payée'],
+        message: 'Le statut de la commande doit faire partie des deux états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
+    )]
     private ?string $paymentStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -42,18 +52,23 @@ class Command
     private ?int $totalQuantity = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le prix total de la commande ne peut être vide.')]
     private ?float $totalPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'commands')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: 'Veuillez renseigner le client qui à fait l\'achat.')]
     private ?User $customer = null;
 
     #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'commands')]
+    #[Assert\NotBlank(message: 'Veuillez renseigner l\'oeuvre qui a été acheté.')]
     private Collection $products;
 
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->commandStatus = "Non payée";
     }
 
     public function getId(): ?int
