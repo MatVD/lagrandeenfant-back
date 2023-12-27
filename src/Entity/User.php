@@ -23,14 +23,8 @@ use ApiPlatform\Metadata\Put;
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(
-            security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Vous n'avez pas les droits pour cette action."
-        ),
-        new Put(
-            security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Vous n'avez pas les droits pour cette action."
-        )
+        new Post(),
+        new Put()
     ]
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
