@@ -49,6 +49,7 @@ class Command
     private ?int $quantityByProduct = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'La quantité totale ne peut être vide.')]
     private ?int $totalQuantity = null;
 
     #[ORM\Column]
@@ -61,14 +62,15 @@ class Command
     private ?User $customer = null;
 
     #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'commands')]
-    #[Assert\NotBlank(message: 'Veuillez renseigner l\'oeuvre qui a été acheté.')]
+    #[Assert\NotBlank(message: 'Veuillez renseigner la ou les oeuvres qui ont été acheté.')]
     private Collection $products;
 
     public function __construct()
     {
         $this->products = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
-        $this->commandStatus = "Non payée";
+        $this->commandStatus = "En cours de traitement";
+        $this->paymentStatus = "Non payée";
     }
 
     public function getId(): ?int

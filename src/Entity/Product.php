@@ -23,10 +23,7 @@ use ApiPlatform\Metadata\Put;
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Vous n'avez pas les droits pour cette action."
         ),
-        new Put(
-            security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Vous n'avez pas les droits pour cette action."
-        )
+        new Put()
     ]
 )]
 class Product
@@ -52,6 +49,7 @@ class Product
 
     #[ORM\Column(nullable: true)]
     #[Assert\NotBlank(message: 'Veuillez indiquer la quantité en stock.')]
+    #[Assert\PositiveOrZero(message: 'La quantité doit être supérieur ou égale à zéro.')]
     private ?int $quantity = null;
 
     #[ORM\Column]

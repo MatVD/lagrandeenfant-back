@@ -38,12 +38,12 @@ class BlogPost
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le titre ne peut être vide.')]
-    #[Assert\Length(min: 1, max: 255, minMessage: "Le titre doit avoir au moins {{ limit }} caracteres", maxMessage: "Le titre doit avoir maximum {{ limit }} caractères")]
+    #[Assert\Length(min: 1, max: 255, minMessage: "Le titre doit avoir au moins {{ limit }} caractères", maxMessage: "Le titre doit avoir maximum {{ limit }} caractères")]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: 'Le contenu ne peut être vide.')]
-    #[Assert\Length(min: 1, max: 5000, minMessage: "Le contenu doit avoir au moins {{ limit }} caracteres", maxMessage: "Le contenu doit avoir maximum {{ limit }} caractères")]
+    #[Assert\Length(min: 1, max: 5000, minMessage: "Le contenu doit avoir au moins {{ limit }} caractères", maxMessage: "Le contenu doit avoir maximum {{ limit }} caractères")]
     private ?string $content = null;
 
     #[ORM\Column]
