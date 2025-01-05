@@ -83,115 +83,82 @@ class AppFixtures extends Fixture
             $manager->persist($categorie);
         }
 
-        $manager->flush();
+        // Création des catégories fixes
+        $categories = [];
+        $categoryData = [
+            'Peintures' => 'Œuvres picturales uniques',
+            'Sculptures' => 'Créations en volume',
+            'Photographies' => 'Tirages artistiques',
+            'Art digital' => 'Œuvres numériques'
+        ];
 
-
-        // // Images de bijoux avec un nom unique
-        // $image1 = new Image();
-        // $image1->setImageName('20230404_144808.webp');
-
-        // $image2 = new Image();
-        // $image2->setImageName('20230404_161250.webp');
-
-        // $image3 = new Image();
-        // $image3->setImageName('20230404_103557.webp');
-
-        // $image4 = new Image();
-        // $image4->setImageName('20230413_184601.webp');
-
-        // $image5 = new Image();
-        // $image5->setImageName('20221222_092117.jpg');
-
-        // $image6 = new Image();
-        // $image6->setImageName('20230314_140343.jpg');
-
-        // $image7 = new Image();
-        // $image7->setImageName('20230314_143151.jpg');
-
-        // $image8 = new Image();
-        // $image8->setImageName('20230314_144223.jpg');
-
-        // $image10 = new Image();
-        // $image10->setImageName('20230321_085945.jpg');
-
-        // $image11 = new Image();
-        // $image11->setImageName('20230408_151805.jpg');
-
-        // $image12 = new Image();
-        // $image12->setImageName('20230411_145700.jpg');
-
-        // $image13 = new Image();
-        // $image13->setImageName('boucles-violettes.webp');
-
-
-
-        // // - Products - //
-        // $product1 = (new Product())
-        //     ->setName("Bijoux1")
-        //     ->setDescription("Un bijoux d\'une rare beauté")
-        //     ->addCategory($categorie)
-        //     ->addImage($image1)
-        //     ->addImage($image2)
-        //     ->addImage($image3)
-        //     ->setPrice("20.00")
-        //     ->setSlug("bijoux1")
-        //     ->setQuantity(5);
-
-        // $manager->persist($product1);
-
-        // $product2 = (new Product())
-        //     ->setName("Bijoux2")
-        //     ->setDescription("Un bijoux d\'une rare beauté")
-        //     ->addCategory($categorie)
-        //     ->addImage($image4)
-        //     ->addImage($image5)
-        //     ->addImage($image6)
-        //     ->setPrice("20.00")
-        //     ->setSlug("bijoux2")
-        //     ->setQuantity(5);
-
-        // $manager->persist($product2);
-
-        // $product3 = (new Product())
-        //     ->setName("Bijoux3")
-        //     ->setDescription("Un bijoux d\'une rare beauté")
-        //     ->addCategory($categorie)
-        //     ->addImage($image7)
-        //     ->addImage($image8)
-        //     ->addImage($image10)
-        //     ->setPrice("20.00")
-        //     ->setSlug("bijoux3")
-        //     ->setQuantity(5);
-
-        // $manager->persist($product3);
-
-        // $product4 = (new Product())
-        //     ->setName("Bijoux4")
-        //     ->setDescription("Un bijoux d\'une rare beauté")
-        //     ->addCategory($categorie)
-        //     ->addImage($image11)
-        //     ->addImage($image12)
-        //     ->addImage($image13)
-        //     ->setPrice("20.00")
-        //     ->setSlug("bijoux4")
-        //     ->setQuantity(5);
-
-        // $manager->persist($product4);
-
-
-        for ($i = 0; $i < 10; $i++) {
-            // Boucle pour générer 10 produits
-            $product[$i] = (new Product())
-                ->setName("Oeuvre$i")
-                ->setDescription("Une oeuvre d\'une rare beauté")
-                ->addCategory($categorie)
-                ->setPrice("20.00")
-                ->setSlug("oeuvre-$i")
-                ->setQuantity(5);
-
-            $manager->persist($product[$i]);
+        foreach ($categoryData as $name => $description) {
+            $category = new Category();
+            $category->setName($name)
+                    ->setDescription($description)
+                    ->setSlug(strtolower(str_replace(' ', '-', $name)));
+            $categories[] = $category;
+            $manager->persist($category);
         }
 
+        $manager->flush();
+
+        // Création des produits
+        $productsData = [
+            [
+                'name' => 'Abstraction en bleu',
+                'description' => 'Une œuvre abstraite aux tons bleus évoquant l\'océan et le ciel',
+                'price' => 450.00,
+                'quantity' => 1,
+                'category' => $categories[0], // Peintures
+                'discount' => '10%'
+            ],
+            [
+                'name' => 'Nature morte contemporaine',
+                'description' => 'Composition moderne de fruits et objets du quotidien',
+                'price' => 680.00,
+                'quantity' => 1,
+                'category' => $categories[0], // Peintures
+            ],
+            [
+                'name' => 'Envol métallique',
+                'description' => 'Sculpture en acier représentant un oiseau en plein vol',
+                'price' => 1200.00,
+                'quantity' => 2,
+                'category' => $categories[1], // Sculptures
+                'discount' => '15%'
+            ],
+            [
+                'name' => 'Lumière urbaine',
+                'description' => 'Photographie nocturne de paysage urbain',
+                'price' => 300.00,
+                'quantity' => 5,
+                'category' => $categories[2], // Photographies
+            ],
+            [
+                'name' => 'Pixels en mouvement',
+                'description' => 'Création numérique dynamique et colorée',
+                'price' => 250.00,
+                'quantity' => 10,
+                'category' => $categories[3], // Art digital
+            ]
+        ];
+
+        foreach ($productsData as $productData) {
+            $product = new Product();
+            $product->setName($productData['name'])
+                   ->setDescription($productData['description'])
+                   ->setPrice($productData['price'])
+                   ->setQuantity($productData['quantity'])
+                   ->setSlug(strtolower(str_replace(' ', '-', $productData['name'])))
+                   ->addCategory($productData['category']);
+            
+            if (isset($productData['discount'])) {
+                $product->setDiscount($productData['discount']);
+            }
+
+            $manager->persist($product);
+        }
 
         $manager->flush();
     }
