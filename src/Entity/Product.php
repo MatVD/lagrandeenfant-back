@@ -13,9 +13,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource(
+    normalizationContext: ['groups' => ['products:read']],
+    denormalizationContext: ['groups' => ['products:write']],
     operations: [
         new Get(),
         new GetCollection(),
@@ -31,10 +34,12 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['products:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Veuillez renseigner le nom de l\'oeuvre.')]
+    #[Groups(['products:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -45,33 +50,42 @@ class Product
         minMessage: 'Veuillez renseigner une description d\'au moins {{ limit }} caratères.',
         maxMessage: 'Veuillez renseigner une description avec moins de {{ limit }} caratères'
     )]
+    #[Groups(['products:read'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
     #[Assert\NotBlank(message: 'Veuillez indiquer la quantité en stock.')]
     #[Assert\PositiveOrZero(message: 'La quantité doit être supérieur ou égale à zéro.')]
+    #[Groups(['products:read'])]
     private ?int $quantity = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Veuillez renseigner le prix de l\'oeuvre.')]
+    #[Groups(['products:read'])]
     private ?float $price = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['products:read'])]
     private ?string $slug = null;
 
     #[ORM\ManyToMany(targetEntity: Command::class, mappedBy: 'products')]
+    #[Groups(['products:read'])]
     private Collection $commands;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
+    #[Groups(['products:read'])]
     private Collection $categories;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Comment::class)]
+    #[Groups(['products:read'])]
     private Collection $comments;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Image::class)]
+    #[Groups(['products:read'])]
     private Collection $images;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['products:read'])]
     private ?string $discount = null;
 
     public function __construct()

@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ApiResource(
@@ -39,6 +40,7 @@ class Category
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le nom de la catégorie ne peut être vide.')]
     #[Assert\Length(min: 1, max: 255, minMessage: "Le nom doit avoir au moins {{ limit }} caractères", maxMessage: "Le nom doit avoir maximum {{ limit }} caractères")]
+    #[Groups(['products:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]

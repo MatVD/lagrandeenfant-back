@@ -16,8 +16,7 @@ class AppFixtures extends Fixture
 {
     public function __construct(
         private UserPasswordHasherInterface $hasher,
-    ) {
-    }
+    ) {}
 
     public function load(ObjectManager $manager): void
     {
@@ -72,31 +71,20 @@ class AppFixtures extends Fixture
         }
 
 
-        // - Categories - //
-        for ($i = 1; $i < 5; $i++) {
-            // Boucle pour générer 4 categories
-            $categorie = (new Category())
-                ->setName("Catégorie$i")
-                ->setDescription("Catégorie $i: Un ensemble de produits")
-                ->setSlug("Catégorie$i");
-
-            $manager->persist($categorie);
-        }
-
         // Création des catégories fixes
         $categories = [];
         $categoryData = [
-            'Peintures' => 'Œuvres picturales uniques',
-            'Sculptures' => 'Créations en volume',
-            'Photographies' => 'Tirages artistiques',
+            'Toiles personnalisées' => 'Toiles personnalisées',
+            'Tableaux' => 'Tableaux',
+            'Cartes et Affiches' => 'Cartes et Affiches',
             'Art digital' => 'Œuvres numériques'
         ];
 
         foreach ($categoryData as $name => $description) {
             $category = new Category();
             $category->setName($name)
-                    ->setDescription($description)
-                    ->setSlug(strtolower(str_replace(' ', '-', $name)));
+                ->setDescription($description)
+                ->setSlug(strtolower(str_replace(' ', '-', $name)));
             $categories[] = $category;
             $manager->persist($category);
         }
@@ -121,6 +109,14 @@ class AppFixtures extends Fixture
                 'category' => $categories[0], // Peintures
             ],
             [
+                'name' => 'Envol féérique',
+                'description' => 'Sculpture en acier représentant un oiseau en plein vol',
+                'price' => 1000.00,
+                'quantity' => 2,
+                'category' => $categories[1], // Sculptures
+                'discount' => '15%'
+            ],
+            [
                 'name' => 'Envol métallique',
                 'description' => 'Sculpture en acier représentant un oiseau en plein vol',
                 'price' => 1200.00,
@@ -136,9 +132,23 @@ class AppFixtures extends Fixture
                 'category' => $categories[2], // Photographies
             ],
             [
+                'name' => 'Sophie stick',
+                'description' => 'Photographie nocturne de paysage urbain',
+                'price' => 300.00,
+                'quantity' => 5,
+                'category' => $categories[2], // Photographies
+            ],
+            [
                 'name' => 'Pixels en mouvement',
                 'description' => 'Création numérique dynamique et colorée',
                 'price' => 250.00,
+                'quantity' => 10,
+                'category' => $categories[3], // Art digital
+            ],
+            [
+                'name' => 'Or dur',
+                'description' => 'Création numérique dynamique et colorée',
+                'price' => 200.00,
                 'quantity' => 10,
                 'category' => $categories[3], // Art digital
             ]
@@ -147,12 +157,12 @@ class AppFixtures extends Fixture
         foreach ($productsData as $productData) {
             $product = new Product();
             $product->setName($productData['name'])
-                   ->setDescription($productData['description'])
-                   ->setPrice($productData['price'])
-                   ->setQuantity($productData['quantity'])
-                   ->setSlug(strtolower(str_replace(' ', '-', $productData['name'])))
-                   ->addCategory($productData['category']);
-            
+                ->setDescription($productData['description'])
+                ->setPrice($productData['price'])
+                ->setQuantity($productData['quantity'])
+                ->setSlug(strtolower(str_replace(' ', '-', $productData['name'])))
+                ->addCategory($productData['category']);
+
             if (isset($productData['discount'])) {
                 $product->setDiscount($productData['discount']);
             }
