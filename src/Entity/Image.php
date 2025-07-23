@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
 #[ApiResource(
@@ -45,6 +46,10 @@ class Image
 
     #[ORM\ManyToOne(inversedBy: 'images')]
     private ?BlogPost $blogPost = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['products:read'])]
+    private ?string $imgUrl = null;
 
     public function getId(): ?int
     {
@@ -95,6 +100,18 @@ class Image
     public function setBlogPost(?BlogPost $blogPost): static
     {
         $this->blogPost = $blogPost;
+
+        return $this;
+    }
+
+    public function getImgUrl(): ?string
+    {
+        return $this->imgUrl;
+    }
+
+    public function setImgUrl(string $imgUrl): static
+    {
+        $this->imgUrl = $imgUrl;
 
         return $this;
     }

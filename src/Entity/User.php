@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'Il y a déjà un compte avec cet email.')]
@@ -67,8 +68,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class)]
     private Collection $comments;
 
-    #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Command::class)]
-    private Collection $commands;
+    #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Order::class)]
+    private Collection $Orders;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $shippingInfos = null;
@@ -80,7 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->registrationDate = new \DateTime;
         $this->comments = new ArrayCollection();
-        $this->commands = new ArrayCollection();
+        $this->Orders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -225,29 +226,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Command>
+     * @return Collection<int, Order>
      */
-    public function getCommands(): Collection
+    public function getOrders(): Collection
     {
-        return $this->commands;
+        return $this->Orders;
     }
 
-    public function addCommand(Command $command): static
+    public function addOrder(Order $Order): static
     {
-        if (!$this->commands->contains($command)) {
-            $this->commands->add($command);
-            $command->setCustomer($this);
+        if (!$this->Orders->contains($Order)) {
+            $this->Orders->add($Order);
+            $Order->setCustomer($this);
         }
 
         return $this;
     }
 
-    public function removeCommand(Command $command): static
+    public function removeOrder(Order $Order): static
     {
-        if ($this->commands->removeElement($command)) {
+        if ($this->Orders->removeElement($Order)) {
             // set the owning side to null (unless already changed)
-            if ($command->getCustomer() === $this) {
-                $command->setCustomer(null);
+            if ($Order->getCustomer() === $this) {
+                $Order->setCustomer(null);
             }
         }
 
@@ -276,5 +277,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isVerified = $isVerified;
 
         return $this;
+    }
+
+    #[Groups(['products:read'])]
+    function getFullName(): string
+    {
+        return $this->firstname . ' ' . $this->lastname;
     }
 }

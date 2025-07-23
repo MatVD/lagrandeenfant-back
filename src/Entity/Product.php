@@ -68,9 +68,9 @@ class Product
     #[Groups(['products:read'])]
     private ?string $slug = null;
 
-    #[ORM\ManyToMany(targetEntity: Command::class, mappedBy: 'products')]
+    #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'products')]
     #[Groups(['products:read'])]
-    private Collection $commands;
+    private Collection $Orders;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
     #[Groups(['products:read'])]
@@ -90,7 +90,7 @@ class Product
 
     public function __construct()
     {
-        $this->commands = new ArrayCollection();
+        $this->Orders = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->images = new ArrayCollection();
@@ -162,27 +162,27 @@ class Product
     }
 
     /**
-     * @return Collection<int, Command>
+     * @return Collection<int, Order>
      */
-    public function getCommands(): Collection
+    public function getOrders(): Collection
     {
-        return $this->commands;
+        return $this->Orders;
     }
 
-    public function addCommand(Command $command): static
+    public function addOrder(Order $Order): static
     {
-        if (!$this->commands->contains($command)) {
-            $this->commands->add($command);
-            $command->addProduct($this);
+        if (!$this->Orders->contains($Order)) {
+            $this->Orders->add($Order);
+            $Order->addProduct($this);
         }
 
         return $this;
     }
 
-    public function removeCommand(Command $command): static
+    public function removeOrder(Order $Order): static
     {
-        if ($this->commands->removeElement($command)) {
-            $command->removeProduct($this);
+        if ($this->Orders->removeElement($Order)) {
+            $Order->removeProduct($this);
         }
 
         return $this;

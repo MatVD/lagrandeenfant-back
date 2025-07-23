@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Put;
 use App\Repository\CommentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
@@ -31,6 +32,7 @@ class Comment
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: 'Veuillez renseigner l\'auteur du commentaire.')]
+    #[Groups(['products:read'])]
     private ?User $author = null;
 
     #[ORM\Column]
@@ -44,6 +46,7 @@ class Comment
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: 'Veuillez renseigner le contenu du commentaire.')]
+    #[Groups(['products:read'])]
     private ?string $content = null;
 
     #[ORM\Column]

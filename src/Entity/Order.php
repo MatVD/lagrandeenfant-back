@@ -2,24 +2,27 @@
 
 namespace App\Entity;
 
-use App\Repository\CommandRepository;
+use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: CommandRepository::class)]
+#[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ApiResource]
-class Command
+class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['products:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La date de création ne peut être vide.')]
+    #[Groups(['products:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -28,15 +31,17 @@ class Command
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Choice(
         choices: ['En cours de traitement', 'Envoyée', 'Reçue'],
-        message: 'Le statut de la commande doit faire partie des trois états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
+        message: 'Le statut de la Ordere doit faire partie des trois états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
     )]
-    private ?string $commandStatus = null;
+    #[Groups(['products:read'])]
+    private ?string $OrderStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Choice(
         choices: ['Non payée', 'Payée'],
-        message: 'Le statut de la commande doit faire partie des deux états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
+        message: 'Le statut de la Ordere doit faire partie des deux états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
     )]
+    #[Groups(['products:read'])]
     private ?string $paymentStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -53,15 +58,16 @@ class Command
     private ?int $totalQuantity = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message: 'Le prix total de la commande ne peut être vide.')]
+    #[Assert\NotBlank(message: 'Le prix total de la Ordere ne peut être vide.')]
     private ?float $totalPrice = null;
 
-    #[ORM\ManyToOne(inversedBy: 'commands')]
+    #[ORM\ManyToOne(inversedBy: 'Orders')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: 'Veuillez renseigner le client qui à fait l\'achat.')]
+    #[Groups(['products:read'])]
     private ?User $customer = null;
 
-    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'commands')]
+    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'Orders')]
     #[Assert\NotBlank(message: 'Veuillez renseigner la ou les oeuvres qui ont été acheté.')]
     private Collection $products;
 
@@ -69,7 +75,7 @@ class Command
     {
         $this->products = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
-        $this->commandStatus = "En cours de traitement";
+        $this->OrderStatus = "En cours de traitement";
         $this->paymentStatus = "Non payée";
     }
 
@@ -102,14 +108,14 @@ class Command
         return $this;
     }
 
-    public function getCommandStatus(): ?string
+    public function getOrderStatus(): ?string
     {
-        return $this->commandStatus;
+        return $this->OrderStatus;
     }
 
-    public function setCommandStatus(?string $commandStatus): static
+    public function setOrderStatus(?string $OrderStatus): static
     {
-        $this->commandStatus = $commandStatus;
+        $this->OrderStatus = $OrderStatus;
 
         return $this;
     }

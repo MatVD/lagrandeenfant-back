@@ -4,7 +4,7 @@ namespace App\Tests;
 
 use App\Entity\BlogPost;
 use App\Entity\Cart;
-use App\Entity\Command;
+use App\Entity\Order;
 use App\Entity\Comment;
 use App\Entity\Product;
 use App\Entity\User;
@@ -24,7 +24,7 @@ class UserTest extends TestCase
             ->setRegistrationDate(new \DateTime())
             ->setShippingInfos('23 rue du someil')
             ->addComment((new Comment())->setContent('Mon nouveau commentaire'))
-            ->addCommand((new Command())->addProduct((new Product())->setName('Boucle 1')));
+            ->addOrder((new Order())->addProduct((new Product())->setName('Boucle 1')));
     }
 
 
@@ -40,7 +40,7 @@ class UserTest extends TestCase
         $this->assertInstanceOf(\DateTime::class, $user->getRegistrationDate());
         $this->assertSame('23 rue du someil', $user->getShippingInfos());
         $this->assertSame('Mon nouveau commentaire', $user->getComments()[0]->getContent());
-        $this->assertSame('Boucle 1', $user->getCommands()[0]->getProducts()[0]->getName());
+        $this->assertSame('Boucle 1', $user->getOrders()[0]->getProducts()[0]->getName());
     }
 
     public function testIfNotEquals(): void
@@ -54,7 +54,7 @@ class UserTest extends TestCase
         $this->assertNotEquals(['ROLE_CUSTOMER'], $user->getRoles());
         $this->assertNotEquals('23 rue du sommeil', $user->getShippingInfos());
         $this->assertNotEquals('Mon dernier commentaire', $user->getComments()[0]->getContent());
-        $this->assertNotEquals('Boucle 2', $user->getCommands()[0]->getProducts()[0]->getName());
+        $this->assertNotEquals('Boucle 2', $user->getOrders()[0]->getProducts()[0]->getName());
     }
 
     public function testIfEmpty(): void
@@ -68,6 +68,6 @@ class UserTest extends TestCase
         $this->assertEmpty('', $user->getPassword());
         $this->assertEmpty('', $user->getShippingInfos());
         $this->assertEmpty('', $user->getComments()[0]->getContent());
-        $this->assertEmpty('', $user->getCommands()[0]->getProducts()[0]->getName());
+        $this->assertEmpty('', $user->getOrders()[0]->getProducts()[0]->getName());
     }
 }
