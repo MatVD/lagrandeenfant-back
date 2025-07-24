@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
+#[ORM\Table(name: '`order`')]
 #[ApiResource]
 class Order
 {
@@ -67,16 +68,18 @@ class Order
     #[Groups(['products:read'])]
     private ?User $customer = null;
 
-    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'Orders')]
-    #[Assert\NotBlank(message: 'Veuillez renseigner la ou les oeuvres qui ont été acheté.')]
+    /**
+     * @var Collection<int, Product>
+     */
+    #[ORM\OneToMany(mappedBy: 'orderProduct', targetEntity: Product::class)]
     private Collection $products;
 
     public function __construct()
     {
-        $this->products = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->OrderStatus = "En cours de traitement";
         $this->paymentStatus = "Non payée";
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -216,6 +219,7 @@ class Order
     {
         if (!$this->products->contains($product)) {
             $this->products->add($product);
+            $product->setOrderProduct($this);
         }
 
         return $this;
@@ -223,7 +227,12 @@ class Order
 
     public function removeProduct(Product $product): static
     {
-        $this->products->removeElement($product);
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getOrderProduct() === $this) {
+                $product->setOrderProduct(null);
+            }
+        }
 
         return $this;
     }

@@ -4,12 +4,11 @@ namespace App\DataFixtures;
 
 use App\Entity\BlogPost;
 use App\Entity\Category;
-use App\Entity\Order;
 use App\Entity\Comment;
 use App\Entity\Image;
 use App\Entity\Product;
 use App\Entity\User;
-use App\Entity\OrderItem;
+use App\Entity\Order;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -100,7 +99,7 @@ class AppFixtures extends Fixture
                 'name' => 'Abstraction en bleu',
                 'description' => 'Une œuvre abstraite aux tons bleus évoquant l\'océan et le ciel',
                 'price' => 450.00,
-                'quantity' => 1,
+                'quantity' => 5,
                 'category' => $categories[0], // Toiles personnalisées
                 'discount' => '10%',
                 'images' => [
@@ -112,7 +111,7 @@ class AppFixtures extends Fixture
                 'name' => 'Nature morte contemporaine',
                 'description' => 'Composition moderne de fruits et objets du quotidien',
                 'price' => 680.00,
-                'quantity' => 1,
+                'quantity' => 3,
                 'category' => $categories[0], // Toiles personnalisées
                 'images' => [
                     'https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=500',
@@ -147,7 +146,7 @@ class AppFixtures extends Fixture
                 'name' => 'Lumière urbaine',
                 'description' => 'Photographie nocturne de paysage urbain',
                 'price' => 300.00,
-                'quantity' => 5,
+                'quantity' => 8,
                 'category' => $categories[2], // Cartes et Affiches
                 'images' => [
                     'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=500',
@@ -158,7 +157,7 @@ class AppFixtures extends Fixture
                 'name' => 'Sophie stick',
                 'description' => 'Photographie nocturne de paysage urbain',
                 'price' => 300.00,
-                'quantity' => 5,
+                'quantity' => 6,
                 'category' => $categories[2], // Cartes et Affiches
                 'images' => [
                     'https://images.unsplash.com/photo-1578662996442-48f12345678?w=500',
@@ -169,7 +168,7 @@ class AppFixtures extends Fixture
                 'name' => 'Pixels en mouvement',
                 'description' => 'Création numérique dynamique et colorée',
                 'price' => 250.00,
-                'quantity' => 10,
+                'quantity' => 12,
                 'category' => $categories[3], // Art digital
                 'images' => [
                     'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500',
@@ -180,7 +179,7 @@ class AppFixtures extends Fixture
                 'name' => 'Or dur',
                 'description' => 'Création numérique dynamique et colorée',
                 'price' => 200.00,
-                'quantity' => 10,
+                'quantity' => 15,
                 'category' => $categories[3], // Art digital
                 'images' => [
                     'https://images.unsplash.com/photo-1634224556919-8ec2bfe93fac?w=500',
@@ -189,7 +188,7 @@ class AppFixtures extends Fixture
             ]
         ];
 
-        // Stockage des produits pour les Orderes
+        // Stockage des produits pour les commandes
         $products = [];
 
         foreach ($productsData as $productData) {
@@ -216,14 +215,14 @@ class AppFixtures extends Fixture
             }
 
             $manager->persist($product);
-            $products[] = $product; // Stockage pour les Orderes
+            $products[] = $product; // Stockage pour les commandes
 
             // Génération de commentaires aléatoires pour chaque produit
             $commentsTexts = [
                 "Magnifique œuvre, les couleurs sont sublimes !",
                 "Très satisfait de cet achat, la qualité est au rendez-vous.",
                 "Une pièce unique qui apporte beaucoup de caractère à mon salon.",
-                "Excellent rapport qualité-prix, je reOrdere vivement.",
+                "Excellent rapport qualité-prix, je recommande vivement.",
                 "L'artiste a un vrai talent, cette création est exceptionnelle.",
                 "Livraison rapide et emballage soigné, parfait !",
                 "Exactement ce que je cherchais pour ma collection.",
@@ -255,35 +254,50 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
-        // Génération de Orderes
-        $orderStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+        // Génération de commandes
+        $orderStatuses = ['En cours de traitement', 'Envoyée', 'Reçue'];
+        $paymentStatuses = ['Non payée', 'Payée'];
 
         for ($i = 1; $i <= 15; $i++) {
             $order = new Order();
             $order->setCustomer($user_customer)
                 ->setOrderStatus($orderStatuses[array_rand($orderStatuses)])
                 ->setCreatedAt(new \DateTimeImmutable('-' . rand(1, 60) . ' days'))
-                ->setTotalQuantity(rand(1, 5))
-                ->setTotalPrice(rand(100, 1000))
+                ->setPaymentStatus($paymentStatuses[array_rand($paymentStatuses)])
                 ->setShippingDate(new \DateTimeImmutable('-' . rand(1, 30) . ' days'))
-                ->setPaymentStatus(rand(0, 1) ? 'Payée' : 'Non payée')
-                ->setShippingNumber('SN' . rand(1000, 9999))
-                ->setQuantityByProduct(rand(1, 3))
-                ->setDiscount(rand(0, 1) ? rand(5, 20) : null);
+                ->setShippingNumber('SN' . rand(1000, 9999));
 
-            // Ajout d'articles à la Ordere (1 à 3 produits par Ordere)
-            $numberOfItems = rand(1, 3);
-            $selectedProducts = array_rand($products, $numberOfItems);
+            // Sélection d'un nombre aléatoire de produits pour cette commande (1 à 3)
+            $numberOfProducts = rand(1, 3);
+            $selectedProductIndices = array_rand($products, $numberOfProducts);
 
-            if (!is_array($selectedProducts)) {
-                $selectedProducts = [$selectedProducts];
+            // Si un seul produit sélectionné, array_rand retourne un entier
+            if (!is_array($selectedProductIndices)) {
+                $selectedProductIndices = [$selectedProductIndices];
             }
 
-            $totalAmount = 0;
+            $totalQuantity = 0;
+            $totalPrice = 0.0;
 
+            // Associer les produits à la commande
+            foreach ($selectedProductIndices as $productIndex) {
+                $selectedProduct = $products[$productIndex];
+                $quantityOrdered = rand(1, 2);
 
+                // Cloner le produit pour cette commande spécifique
+                $orderProduct = clone $selectedProduct;
+                $orderProduct->setOrderProduct($order);
 
-            $order->setTotalPrice($totalAmount);
+                $totalQuantity += $quantityOrdered;
+                $totalPrice += $selectedProduct->getPrice() * $quantityOrdered;
+
+                $manager->persist($orderProduct);
+            }
+
+            $order->setQuantityByProduct(rand(1, 5)) // Cette valeur semble être une propriété générique
+                ->setTotalQuantity($totalQuantity)
+                ->setTotalPrice($totalPrice);
+
             $manager->persist($order);
         }
 

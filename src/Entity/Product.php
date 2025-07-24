@@ -68,10 +68,6 @@ class Product
     #[Groups(['products:read'])]
     private ?string $slug = null;
 
-    #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'products')]
-    #[Groups(['products:read'])]
-    private Collection $Orders;
-
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
     #[Groups(['products:read'])]
     private Collection $categories;
@@ -88,9 +84,11 @@ class Product
     #[Groups(['products:read'])]
     private ?string $discount = null;
 
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    private ?Order $orderProduct = null;
+
     public function __construct()
     {
-        $this->Orders = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->images = new ArrayCollection();
@@ -157,33 +155,6 @@ class Product
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Order>
-     */
-    public function getOrders(): Collection
-    {
-        return $this->Orders;
-    }
-
-    public function addOrder(Order $Order): static
-    {
-        if (!$this->Orders->contains($Order)) {
-            $this->Orders->add($Order);
-            $Order->addProduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOrder(Order $Order): static
-    {
-        if ($this->Orders->removeElement($Order)) {
-            $Order->removeProduct($this);
-        }
 
         return $this;
     }
@@ -280,6 +251,18 @@ class Product
     public function setDiscount(?string $discount): static
     {
         $this->discount = $discount;
+
+        return $this;
+    }
+
+    public function getOrderProduct(): ?Order
+    {
+        return $this->orderProduct;
+    }
+
+    public function setOrderProduct(?Order $orderProduct): static
+    {
+        $this->orderProduct = $orderProduct;
 
         return $this;
     }
