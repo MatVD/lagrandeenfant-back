@@ -1,7 +1,7 @@
 nelmio_cors:
   defaults:
     origin_regex: true
-    allow_origin: ["https://localhost:5174", "https://lagrandeenfant.com"]
+    allow_origin: ["http://localhost:5174", "https://lagrandeenfant.com"]
     allow_methods: ["GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"]
     allow_headers: ["Content-Type", "Authorization"]
     expose_headers: ["Link"]
@@ -9,7 +9,7 @@ nelmio_cors:
   paths:
     "^/":
       origin_regex: true
-      allow_origin: ["https://localhost:5174", "https://lagrandeenfant.com"]
+      allow_origin: ["http://localhost:5174", "https://lagrandeenfant.com"]
       allow_headers: ["Content-Type", "Authorization"]
       allow_methods: ["GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"]
       allow_credentials: true
