@@ -7,12 +7,35 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(
+            security: "is_granted('ROLE_USER') and (object.getCustomer() == user or is_granted('ROLE_ADMIN'))",
+            securityMessage: "Vous ne pouvez voir que vos propres commandes."
+        ),
+        new GetCollection(
+            security: "is_granted('ROLE_USER')",
+            securityMessage: "Vous devez être connecté pour voir les commandes."
+        ),
+        new Post(
+            security: "is_granted('ROLE_USER')",
+            securityMessage: "Vous devez être connecté pour passer commande."
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: "Seuls les administrateurs peuvent modifier les commandes."
+        )
+    ]
+)]
 class Order
 {
     #[ORM\Id]

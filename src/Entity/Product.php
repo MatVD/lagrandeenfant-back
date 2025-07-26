@@ -26,7 +26,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Vous n'avez pas les droits pour cette action."
         ),
-        new Put()
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: "Vous n'avez pas les droits pour cette action."
+        )
     ]
 )]
 class Product

@@ -18,8 +18,14 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(),
-        new Put()
+        new Post(
+            security: "is_granted('ROLE_USER')",
+            securityMessage: "Vous devez être connecté pour commenter."
+        ),
+        new Put(
+            security: "is_granted('ROLE_USER') and (object.getAuthor() == user or is_granted('ROLE_ADMIN'))",
+            securityMessage: "Vous ne pouvez modifier que vos propres commentaires."
+        )
     ]
 )]
 class Comment

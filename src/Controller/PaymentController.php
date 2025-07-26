@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class PaymentController extends AbstractController
 {
@@ -27,11 +28,11 @@ class PaymentController extends AbstractController
         private EntityManagerInterface $entityManager,
         private UserPasswordHasherInterface $hasher,
         private UserRepository $userRepository
-    ) {
-    }
+    ) {}
 
 
-    #[Route('/checkout', name: 'checkout', methods: ['POST', 'GET'])]
+    #[Route('/checkout', name: 'checkout', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function checkout(Request $request): Response
     {
         header('Content-Type: application/json');

@@ -22,24 +22,40 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[UniqueEntity(fields: ['email'], message: 'Il y a déjà un compte avec cet email.')]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Put()
-    ]
+        new Get(
+            security: "is_granted('ROLE_USER') and (object == user or is_granted('ROLE_ADMIN'))",
+            securityMessage: "Vous ne pouvez voir que votre profil."
+        ),
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: "Seuls les administrateurs peuvent lister les utilisateurs."
+        ),
+        new Post(
+            security: "is_granted('PUBLIC_ACCESS')",
+        ),
+        new Put(
+            security: "is_granted('ROLE_USER') and (object == user or is_granted('ROLE_ADMIN'))",
+            securityMessage: "Vous ne pouvez modifier que votre profil."
+        )
+    ],
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']]
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank(message: 'Veuillez renseigner l\'email.')]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['user:read'])] // Seulement en lecture, pas d'écriture directe
     private array $roles = [];
 
     /**
@@ -52,17 +68,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@+$^%!§:\'<\->¨()%#"=*;çé€?$\/&])[A-Za-z\d@+$^%!§:\'<\->¨()%#"=*;çé€?$\/&]{12,}$/',
         message: 'Le mot de passe doit contenir des minuscules, majuscules, chiffres et caractères spéciaux (@-/&#?)'
     )]
+    #[Groups(['user:write'])] // Mot de passe jamais exposé en lecture
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Veuillez renseigner votre prénom.')]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Veuillez renseigner votre nom.')]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $lastname = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['user:read'])]
     private ?\DateTimeInterface $registrationDate = null;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class)]
