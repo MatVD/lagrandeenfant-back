@@ -102,6 +102,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->registrationDate = new \DateTime;
         $this->comments = new ArrayCollection();
         $this->Orders = new ArrayCollection();
+        $this->roles = ['ROLE_USER'];
     }
 
     public function getId(): ?int
