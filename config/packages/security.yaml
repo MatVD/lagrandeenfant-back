@@ -49,20 +49,21 @@ security:
   # Easy way to control access for large sections of your site
   # Note: Only the *first* access control that matches will be used
   access_control:
-        # Routes complètement publiques
-        - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
-        - { path: ^/api/register, roles: PUBLIC_ACCESS }
-        - { path: ^/api/products, roles: PUBLIC_ACCESS, methods: [GET] }
-        - { path: ^/api/contact, roles: PUBLIC_ACCESS, methods: [POST] }
-        
-        # Routes nécessitant une authentification
-        - { path: ^/api/orders, roles: ROLE_USER }
-        - { path: ^/api/me, roles: ROLE_USER }
-        - { path: ^/api/promo-codes, roles: ROLE_USER }
-        
-        # Routes admin
-        - { path: ^/api/admin, roles: ROLE_ADMIN }
-        - { path: ^/api, roles: ROLE_USER }
+    # Routes complètement publiques
+    - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
+    - { path: ^/api/register, roles: PUBLIC_ACCESS }
+    - { path: ^/api/verify/email, roles: PUBLIC_ACCESS }
+    - { path: ^/api/products, roles: PUBLIC_ACCESS, methods: [GET] }
+    - { path: ^/api/contact, roles: PUBLIC_ACCESS, methods: [POST] }
+
+    # Routes nécessitant une authentification
+    - { path: ^/api/orders, roles: ROLE_USER }
+    - { path: ^/api/me, roles: ROLE_USER }
+    - { path: ^/api/promo-codes, roles: ROLE_USER }
+
+    # Routes admin
+    - { path: ^/api/admin, roles: ROLE_ADMIN }
+    - { path: ^/api, roles: ROLE_USER }
 
 when@test:
   security:

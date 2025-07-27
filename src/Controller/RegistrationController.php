@@ -17,12 +17,14 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
 
-    public function __construct(EmailVerifier $emailVerifier)
+    public function __construct(EmailVerifier $emailVerifier, private ParameterBagInterface $parameterBag)
     {
         $this->emailVerifier = $emailVerifier;
     }
@@ -68,18 +70,19 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/api/verify/email', name: 'app_verify_email')]
-    public function verifyUserEmail(Request $request, TranslatorInterface $translator, UserRepository $userRepository): bool
+    public function verifyUserEmail(Request $request, TranslatorInterface $translator, UserRepository $userRepository): Response
     {
         $id = $request->query->get('id');
+        $frontUrl = $this->parameterBag->get('REACT_APP_FRONT_URL') ?? 'http://localhost:5174';
 
         if (null === $id) {
-            return false;
+            return $this->redirectToRoute('app_register');
         }
 
         $user = $userRepository->find($id);
 
         if (null === $user) {
-            return false;
+            return new RedirectResponse("$frontUrl/login");
         }
 
         // validate email confirmation link, sets User::isVerified=true and persists
@@ -88,13 +91,12 @@ class RegistrationController extends AbstractController
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
 
-            return false;
+            return new RedirectResponse("$frontUrl/login");
         }
 
         // @TODO Change the redirect on success and handle or remove the flash message in your templates
         $this->addFlash('success', 'Your email address has been verified.');
 
-        return true;
-        
+        return new RedirectResponse("$frontUrl/login");
     }
 }
