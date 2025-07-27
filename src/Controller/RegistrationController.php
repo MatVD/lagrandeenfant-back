@@ -23,10 +23,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
+    private ParameterBagInterface $parameterBag;
 
-    public function __construct(EmailVerifier $emailVerifier, private ParameterBagInterface $parameterBag)
+    public function __construct(EmailVerifier $emailVerifier, ParameterBagInterface $parameterBag)
     {
         $this->emailVerifier = $emailVerifier;
+        $this->parameterBag = $parameterBag;
     }
 
     #[Route('/api/register', name: 'app_register', methods: ['POST'])]
