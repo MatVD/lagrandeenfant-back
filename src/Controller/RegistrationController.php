@@ -66,7 +66,7 @@ class RegistrationController extends AbstractController
 
         return $this->json([
             "erreur" => "Une erreur est survenue !",
-        ],);
+        ], 400);
     }
 
     #[Route('/api/verify/email', name: 'app_verify_email')]
