@@ -9,8 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('ROLE_USER')",
             securityMessage: "Vous devez être connecté pour passer commande."
         ),
-        new Put(
+        new Patch(
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Seuls les administrateurs peuvent modifier les commandes."
         )

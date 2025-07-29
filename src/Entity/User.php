@@ -14,8 +14,8 @@ use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Post(
             security: "is_granted('PUBLIC_ACCESS')",
         ),
-        new Put(
+        new Patch(
             security: "is_granted('ROLE_USER') and (object == user or is_granted('ROLE_ADMIN'))",
             securityMessage: "Vous ne pouvez modifier que votre profil."
         )
