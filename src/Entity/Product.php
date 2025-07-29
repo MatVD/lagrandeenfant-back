@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['products:read']],
-    denormalizationContext: ['groups' => ['products:write']],
     operations: [
         new Get(),
         new GetCollection(),
@@ -30,8 +28,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Vous n'avez pas les droits pour cette action."
         )
-    ]
+    ],
+    normalizationContext: ['groups' => ['products:read']],
+    denormalizationContext: ['groups' => ['products:write']],
 )]
+
 class Product
 {
     #[ORM\Id]
@@ -42,7 +43,7 @@ class Product
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Veuillez renseigner le nom de l\'oeuvre.')]
-    #[Groups(['products:read', 'order:read'])]
+    #[Groups(['products:read', 'products:write', 'order:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -53,18 +54,18 @@ class Product
         minMessage: 'Veuillez renseigner une description d\'au moins {{ limit }} caratères.',
         maxMessage: 'Veuillez renseigner une description avec moins de {{ limit }} caratères'
     )]
-    #[Groups(['products:read'])]
+    #[Groups(['products:read', 'products:write'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
     #[Assert\NotBlank(message: 'Veuillez indiquer la quantité en stock.')]
     #[Assert\PositiveOrZero(message: 'La quantité doit être supérieur ou égale à zéro.')]
-    #[Groups(['products:read', 'order:read'])]
+    #[Groups(['products:read', 'products:write', 'order:read'])]
     private ?int $quantity = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Veuillez renseigner le prix de l\'oeuvre.')]
-    #[Groups(['products:read', 'order:read'])]
+    #[Groups(['products:read', 'products:write', 'order:read'])]
     private ?float $price = null;
 
     #[ORM\Column(length: 255)]
@@ -72,7 +73,7 @@ class Product
     private ?string $slug = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
-    #[Groups(['products:read'])]
+    #[Groups(['products:read', 'products:write'])]
     private Collection $categories;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Comment::class)]
@@ -80,11 +81,11 @@ class Product
     private Collection $comments;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Image::class)]
-    #[Groups(['products:read', 'order:read'])]
+    #[Groups(['products:read', 'order:read', 'products:write'])]
     private Collection $images;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['products:read', 'order:read'])]
+    #[Groups(['products:read', 'products:write', 'order:read'])]
     private ?string $discount = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
@@ -107,12 +108,14 @@ class Product
         return $this->name;
     }
 
+
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
+
+
 
     public function getDescription(): ?string
     {
