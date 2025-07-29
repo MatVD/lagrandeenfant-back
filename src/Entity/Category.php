@@ -28,27 +28,32 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Vous n'avez pas les droits pour cette action."
         )
-    ]
+    ],
+    normalizationContext: ['groups' => ['category:read']],
+    denormalizationContext: ['groups' => ['category:write']],
 )]
 class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['category:read', 'products:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le nom de la catégorie ne peut être vide.')]
     #[Assert\Length(min: 1, max: 255, minMessage: "Le nom doit avoir au moins {{ limit }} caractères", maxMessage: "Le nom doit avoir maximum {{ limit }} caractères")]
-    #[Groups(['products:read'])]
+    #[Groups(['category:read', 'products:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: 'Le contenu ne peut être vide.')]
     #[Assert\Length(min: 1, max: 100, minMessage: "La description doit avoir au moins {{ limit }} caractères", maxMessage: "La description doit avoir maximum {{ limit }} caractères")]
+    #[Groups(['category:read'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['category:read'])]
     private ?string $slug = null;
 
     #[ORM\ManyToMany(targetEntity: Product::class, mappedBy: 'categories')]
