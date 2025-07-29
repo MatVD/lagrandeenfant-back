@@ -68,7 +68,7 @@ class Product
     #[Groups(['products:read', 'products:write', 'order:read'])]
     private ?float $price = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     #[Groups(['products:read'])]
     private ?string $slug = null;
 
