@@ -43,12 +43,12 @@ class Order
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La date de création ne peut être vide.')]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -60,7 +60,7 @@ class Order
         choices: ['En cours de traitement', 'Envoyée', 'Reçue'],
         message: 'Le statut de la Ordere doit faire partie des trois états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
     )]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?string $OrderStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -68,35 +68,35 @@ class Order
         choices: ['Non payée', 'Payée'],
         message: 'Le statut de la Ordere doit faire partie des deux états suivants : {{ choices }}. {{ value }} n\'en fait pas partie'
     )]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?string $paymentStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?string $shippingNumber = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?float $discount = null;
 
     #[ORM\Column]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?int $quantityByProduct = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La quantité totale ne peut être vide.')]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?int $totalQuantity = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix total de la Ordere ne peut être vide.')]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?float $totalPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'Orders')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: 'Veuillez renseigner le client qui à fait l\'achat.')]
-    #[Groups(['order:read', 'products:read'])]
+    #[Groups(['order:read', 'product:read'])]
     private ?User $customer = null;
 
     /**

@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -27,10 +28,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Patch(
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Vous n'avez pas les droits pour cette action."
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: "Vous n'avez pas les droits pour cette action."
         )
     ],
-    normalizationContext: ['groups' => ['products:read']],
-    denormalizationContext: ['groups' => ['products:write']],
+    normalizationContext: ['groups' => ['product:read']],
+    denormalizationContext: ['groups' => ['product:write']],
 )]
 
 class Product
@@ -38,12 +43,12 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['products:read'])]
+    #[Groups(['product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Veuillez renseigner le nom de l\'oeuvre.')]
-    #[Groups(['products:read', 'products:write', 'order:read'])]
+    #[Groups(['product:read', 'product:write', 'order:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -54,38 +59,38 @@ class Product
         minMessage: 'Veuillez renseigner une description d\'au moins {{ limit }} caratères.',
         maxMessage: 'Veuillez renseigner une description avec moins de {{ limit }} caratères'
     )]
-    #[Groups(['products:read', 'products:write'])]
+    #[Groups(['product:read', 'product:write'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
     #[Assert\NotBlank(message: 'Veuillez indiquer la quantité en stock.')]
     #[Assert\PositiveOrZero(message: 'La quantité doit être supérieur ou égale à zéro.')]
-    #[Groups(['products:read', 'products:write', 'order:read'])]
+    #[Groups(['product:read', 'product:write', 'order:read'])]
     private ?int $quantity = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Veuillez renseigner le prix de l\'oeuvre.')]
-    #[Groups(['products:read', 'products:write', 'order:read'])]
+    #[Groups(['product:read', 'product:write', 'order:read'])]
     private ?float $price = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Groups(['products:read'])]
+    #[Groups(['product:read'])]
     private ?string $slug = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
-    #[Groups(['products:read', 'products:write'])]
+    #[Groups(['product:read', 'product:write'])]
     private Collection $categories;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Comment::class)]
-    #[Groups(['products:read'])]
+    #[Groups(['product:read'])]
     private Collection $comments;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Image::class)]
-    #[Groups(['products:read', 'order:read', 'products:write'])]
+    #[Groups(['product:read', 'product:write', 'order:read'])]
     private Collection $images;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['products:read', 'products:write', 'order:read'])]
+    #[Groups(['product:read', 'product:write', 'order:read'])]
     private ?string $discount = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]

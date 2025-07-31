@@ -38,7 +38,7 @@ class Comment
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: 'Veuillez renseigner l\'auteur du commentaire.')]
-    #[Groups(['products:read'])]
+    #[Groups(['product:read'])]
     private ?User $author = null;
 
     #[ORM\Column]
@@ -52,7 +52,7 @@ class Comment
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: 'Veuillez renseigner le contenu du commentaire.')]
-    #[Groups(['products:read'])]
+    #[Groups(['product:read'])]
     private ?string $content = null;
 
     #[ORM\Column]

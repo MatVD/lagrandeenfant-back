@@ -5,6 +5,7 @@ api_platform:
   formats:
     json: ["application/json"]
     jsonld: ["application/ld+json"]
+    multipart: ['multipart/form-data']
   docs_formats:
     jsonld: ["application/ld+json"]
     jsonopenapi: ["application/vnd.openapi+json"]
@@ -13,7 +14,7 @@ api_platform:
     pagination_items_per_page: 10
     stateless: true
     cache_headers:
-      vary: ["Content-Type", "Authorization", "Origin"]
+      vary: ["Content-Type", "Authorization", "Origin", "Accept"]
     extra_properties:
       standard_put: true
       rfc_7807_compliant_errors: true
