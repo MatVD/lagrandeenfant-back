@@ -3,13 +3,13 @@ nelmio_cors:
     origin_regex: true
     allow_origin: ["http://localhost:5174", "https://lagrandeenfant.com"]
     allow_methods: ["GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"]
-    allow_headers: ["Content-Type", "Authorization"]
+    allow_headers: ["Content-Type", "Authorization", "Accept", "Origin"]
     expose_headers: ["Link"]
     max_age: 3600
   paths:
     "^/":
       origin_regex: true
       allow_origin: ["http://localhost:5174", "https://lagrandeenfant.com"]
-      allow_headers: ["Content-Type", "Authorization"]
+      allow_headers: ["Content-Type", "Authorization", "Accept", "Origin"]
       allow_methods: ["GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"]
       allow_credentials: true

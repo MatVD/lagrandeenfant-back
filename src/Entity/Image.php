@@ -3,28 +3,36 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use App\Repository\ImageRepository;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
+use App\Controller\ImageUploadController;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[Vich\Uploadable]
 #[ApiResource(
+    normalizationContext: ['groups' => ['image:read']],
+    denormalizationContext: ['groups' => ['image:write']],
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(
+        new Delete(
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Vous n'avez pas les droits pour cette action."
         ),
-        new Patch(
+        new Post(
+            controller: ImageUploadController::class,
+            deserialize: false,
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Vous n'avez pas les droits pour cette action."
-        )
+        ),
     ]
 )]
 class Image
@@ -32,11 +40,22 @@ class Image
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['image:read', 'product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\NotBlank(message: 'Veuillez renseigner le nom de l\'image.')]
-    private ?string $imageName = null;
+    #[Groups(['product:read', 'image:read'])]
+    private ?string $contentUrl = null;
+
+    #[Vich\UploadableField(mapping: 'images', fileNameProperty: 'contentUrl', size: 'imageSize')]
+    #[Assert\File(
+        mimeTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'],
+        mimeTypesMessage: 'Veuillez télécharger une image valide (JPEG, JPG, PNG, WEBP, GIF).'
+    )]
+    private ?File $imageFile = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $imageSize = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
@@ -47,23 +66,30 @@ class Image
     #[ORM\ManyToOne(inversedBy: 'images')]
     private ?BlogPost $blogPost = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['products:read'])]
-    private ?string $imgUrl = null;
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getImageName(): ?string
+
+    public function getContentUrl(): ?string
     {
-        return $this->imageName;
+        return $this->contentUrl;
     }
 
-    public function setImageName(?string $imageName): static
+    #[Groups(["image:read", "product:read"])]
+    public function getContentUrlPublic(): ?string
     {
-        $this->imageName = $imageName;
+        if (!$this->contentUrl) {
+            return null;
+        }
+        // Adapte le chemin selon ta config VichUploaderBundle/public
+        return '/images/' . $this->contentUrl;
+    }
+
+    public function setContentUrl(?string $contentUrl): static
+    {
+        $this->contentUrl = $contentUrl;
 
         return $this;
     }
@@ -104,15 +130,38 @@ class Image
         return $this;
     }
 
-    public function getImgUrl(): ?string
+    /**
+     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
+     * of 'UploadedFile' is injected into this setter to trigger the update. If this
+     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
+     * must be able to accept an instance of 'File' as the bundle will inject one here
+     * during Doctrine hydration.
+     *
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
+     */
+    public function setImageFile(?File $imageFile = null): void
     {
-        return $this->imgUrl;
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
     }
 
-    public function setImgUrl(string $imgUrl): static
+    public function getImageFile(): ?File
     {
-        $this->imgUrl = $imgUrl;
+        return $this->imageFile;
+    }
 
-        return $this;
+    public function setImageSize(?int $imageSize): void
+    {
+        $this->imageSize = $imageSize;
+    }
+
+    public function getImageSize(): ?int
+    {
+        return $this->imageSize;
     }
 }

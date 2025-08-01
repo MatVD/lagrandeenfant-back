@@ -37,13 +37,13 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['category:read', 'products:read'])]
+    #[Groups(['category:read', 'product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le nom de la catégorie ne peut être vide.')]
     #[Assert\Length(min: 1, max: 255, minMessage: "Le nom doit avoir au moins {{ limit }} caractères", maxMessage: "Le nom doit avoir maximum {{ limit }} caractères")]
-    #[Groups(['category:read', 'products:read'])]
+    #[Groups(['category:read', 'product:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
