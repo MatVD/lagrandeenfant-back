@@ -39,6 +39,7 @@ class PaymentController extends AbstractController
 
         // Récupération de la var env.
         $stripe = new StripeClient($this->getParameter('STRIPE_SECRET_KEY'));
+        $frontUrl = $this->getParameter('REACT_APP_FRONT_URL');
 
         $json = $request->getContent();
 
@@ -66,8 +67,7 @@ class PaymentController extends AbstractController
                     'quantity' => 1,
                 ]
             ],
-            'success_url' => "http://localhost:5173/paiement-reussi",
-            'cancel_url' => "http://localhost:5173/paiement-echec",
+            'success_url' => $frontUrl . "/success",
         ]);
 
         if ($this->session->status === 'succeeded') {
