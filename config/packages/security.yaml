@@ -60,6 +60,7 @@ security:
     - { path: ^/api/orders, roles: ROLE_USER }
     - { path: ^/api/me, roles: ROLE_USER }
     - { path: ^/api/promo-codes, roles: ROLE_USER }
+    - { path: ^/api/checkout, roles: ROLE_USER }
 
     # Routes admin
     - { path: ^/api/admin, roles: ROLE_ADMIN }
