@@ -8,6 +8,7 @@ parameters:
   FREE_SHIPPING: "%env(FREE_SHIPPING)%"
   OTHER_SHIPPING: "%env(OTHER_SHIPPING)%"
   REACT_APP_FRONT_URL: "%env(REACT_APP_FRONT_URL)%"
+  BASE_URL: '%env(BASE_URL)%'
 
 services:
   # default configuration for services in *this* file
