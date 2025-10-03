@@ -16,12 +16,20 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Metadata\ApiFilter;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource(
     operations: [
         new Get(),
         new GetCollection(),
+        new GetCollection(
+            uriTemplate: '/products/archived',
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: "Vous n'avez pas les droits pour cette action."
+        ),
         new Delete(
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Vous n'avez pas les droits pour cette action."
@@ -42,6 +50,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => ['product:read']],
     denormalizationContext: ['groups' => ['product:write']],
 )]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'partial', 'description' => 'partial'])]
+#[ApiFilter(RangeFilter::class, properties: ['quantity', 'price'])]
 
 class Product
 {
@@ -280,5 +290,16 @@ class Product
         $this->orderProduct = $orderProduct;
 
         return $this;
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->quantity === 0;
+    }
+
+    #[Groups(['product:read'])]
+    public function getIsArchived(): bool
+    {
+        return $this->isArchived();
     }
 }
