@@ -99,7 +99,7 @@ class PaymentController extends AbstractController
             'shipping_address_collection' => ['allowed_countries' => ['FR']],
             'allow_promotion_codes' => !empty($data['promo_code']),
             'line_items' => $lineItems,
-            'success_url' => $frontUrl . "/success",
+            'success_url' => $frontUrl . "/success?session_id={CHECKOUT_SESSION_ID}",
             'cancel_url' => $frontUrl . "/cart",
             'metadata' => [
                 'user_id' => $userId,
@@ -122,6 +122,58 @@ class PaymentController extends AbstractController
             return new JsonResponse([
                 'success' => false,
                 'message' => 'Erreur lors de la création de la session: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    #[Route('/api/payment/confirm', name: 'api_payment_confirm', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function confirmPayment(Request $request): JsonResponse
+    {
+        $stripe = new StripeClient($this->getParameter('STRIPE_SECRET_KEY'));
+
+        $json = $request->getContent();
+        $data = json_decode($json, true);
+
+        if (!isset($data['session_id']) || !isset($data['items'])) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Données manquantes pour confirmer le paiement'
+            ], 400);
+        }
+
+        try {
+            // Vérifier que la session de paiement a bien été payée
+            $session = $stripe->checkout->sessions->retrieve($data['session_id']);
+
+            if ($session->payment_status !== 'paid') {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Le paiement n\'a pas été confirmé'
+                ], 400);
+            }
+
+            // Décrémenter les quantités des produits
+            foreach ($data['items'] as $item) {
+                if (isset($item['product_id']) && isset($item['quantity'])) {
+                    $product = $this->productRepository->find($item['product_id']);
+                    if ($product && $product->hasStockFor($item['quantity'])) {
+                        $product->decrementQuantity($item['quantity']);
+                    }
+                }
+            }
+
+            // Sauvegarder les modifications
+            $this->entityManager->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Commande confirmée et stock mis à jour'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la confirmation: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -302,4 +302,26 @@ class Product
     {
         return $this->isArchived();
     }
+
+    /**
+     * Décrémente la quantité en stock du produit de manière sécurisée
+     * @param int $quantity Quantité à décrémenter
+     * @return bool True si la décrémentation a été effectuée, false sinon
+     */
+    public function decrementQuantity(int $quantity): bool
+    {
+        if ($this->quantity >= $quantity) {
+            $this->quantity -= $quantity;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Vérifie si le produit a suffisamment de stock pour une quantité donnée
+     */
+    public function hasStockFor(int $quantity): bool
+    {
+        return $this->quantity >= $quantity;
+    }
 }
