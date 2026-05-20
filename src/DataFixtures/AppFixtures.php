@@ -208,7 +208,7 @@ class AppFixtures extends Fixture
             if (isset($productData['images'])) {
                 foreach ($productData['images'] as $imageUrl) {
                     $image = new Image();
-                    $image->setImgUrl($imageUrl)
+                    $image->setContentUrl($imageUrl)
                         ->setProduct($product);
                     $manager->persist($image);
                 }
