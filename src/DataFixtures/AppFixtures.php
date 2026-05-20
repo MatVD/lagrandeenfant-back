@@ -284,14 +284,10 @@ class AppFixtures extends Fixture
                 $selectedProduct = $products[$productIndex];
                 $quantityOrdered = rand(1, 2);
 
-                // Cloner le produit pour cette commande spécifique
-                $orderProduct = clone $selectedProduct;
-                $orderProduct->setOrderProduct($order);
+                $order->addProduct($selectedProduct);
 
                 $totalQuantity += $quantityOrdered;
                 $totalPrice += $selectedProduct->getPrice() * $quantityOrdered;
-
-                $manager->persist($orderProduct);
             }
 
             $order->setQuantityByProduct(rand(1, 5)) // Cette valeur semble être une propriété générique
