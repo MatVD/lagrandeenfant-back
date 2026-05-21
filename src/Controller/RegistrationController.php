@@ -62,7 +62,8 @@ class RegistrationController extends AbstractController
             // do anything else you need here, like send an email
 
             return $this->json([
-                "success" => "Vous êtes maintenant connecté !",
+                'success' => true,
+                'message' => 'Votre compte a été créé. Veuillez vérifier votre email avant de vous connecter.',
             ], 201);
         }
 
