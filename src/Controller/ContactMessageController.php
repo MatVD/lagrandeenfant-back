@@ -34,7 +34,7 @@ class ContactMessageController extends AbstractController
         $entityManager->flush();
 
         // Envoi de l'email à l'administrateur
-        $adminEmail = 'admin@example.com'; // À adapter
+        $adminEmail = $_ENV['CONTACT_ADMIN_EMAIL'] ?? 'contact@lagrandeenfant.com';
         $email = (new Email())
             ->from($contact->getEmail())
             ->to($adminEmail)

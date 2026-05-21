@@ -23,8 +23,6 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new Post(
             controller: \App\Controller\ContactMessageController::class,
-            security: "is_granted('ROLE_USER')",
-            securityMessage: 'Seulement les utilisateurs authentifiés peuvent envoyer un message.',
         ),
         new Delete(
             security: "is_granted('ROLE_USER') and object.getId() === user.getId()",
